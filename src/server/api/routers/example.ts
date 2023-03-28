@@ -43,6 +43,7 @@ export const exampleRouter = createTRPCRouter({
   getDrizzle: publicProcedure.query(async () => {
     const drizzleClient = new Client({
       connectionString: process.env.DATABASE_URL,
+      ssl: true,
     });
 
     await drizzleClient.connect();
