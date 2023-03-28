@@ -1,5 +1,12 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { z } from "zod";
 
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
+);
 import {
   createTRPCRouter,
   publicProcedure,
@@ -17,6 +24,10 @@ export const exampleRouter = createTRPCRouter({
 
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany({ take: 100 });
+  }),
+
+  getSupa: publicProcedure.query(() => {
+    return supabase.from("Example").select().limit(100);
   }),
 
   getSecretMessage: protectedProcedure.query(() => {
