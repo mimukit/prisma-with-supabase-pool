@@ -11,6 +11,8 @@ import { pgTable, text, date } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
 
+import { Client as NeonClient } from "@neondatabase/serverless";
+
 export const exampleTable = pgTable("Example", {
   id: text("id").primaryKey(),
   name: text("name"),
@@ -51,6 +53,18 @@ export const exampleRouter = createTRPCRouter({
     const db = drizzle(drizzleClient);
 
     return db.select().from(exampleTable).limit(100);
+  }),
+
+  getNeon: publicProcedure.query(async () => {
+    const neonClient = new NeonClient(process.env.DATABASE_URL);
+    await neonClient.connect();
+
+    const result = await neonClient.query('SELECT * FROM "Example" LIMIT 100;');
+
+    await neonClient.end();
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return result?.rows;
   }),
 
   getSecretMessage: protectedProcedure.query(() => {
